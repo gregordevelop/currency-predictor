@@ -54,45 +54,30 @@ class App(tk.CTk):
             radioButton = RadioButton(self, text=currency[i], variable=self.selected_currency, value=currency[i])
             radioButton.grid(row=i+1, column=3, sticky='ns')
 
-    def createInformationForCurrency(self, rates,dates):
-        date_label = tk.CTkLabel(master=self, text="Kurs "+self.selected_currency.get()+" od "+dates[0]+" do "+ dates[len(dates)-1])
-        date_label.grid(row=8,column=0,columnspan=3)
+    def display_info(self, rates, dates, start_col, title_prefix):
 
-        number_of_days_label = tk.CTkLabel(master=self,
-                                 text="Liczba dni: "+ str(len(dates)))
-        number_of_days_label.grid(row=7, column=0, columnspan=3)
-
-        max_label = tk.CTkLabel(master=self,
-                                 text="      Wartość maksymalna  " + self.selected_currency.get() + ": "+ '%.2f' % max(rates)+" zł dnia: "+dates[rates.index(max(rates))])
-        max_label.grid(row=9, column=0,columnspan=3,padx=20)
-        min_label = tk.CTkLabel(master=self,
-                                text="  Wartość minimalna  " + self.selected_currency.get() + ": " + '%.2f' %  min(rates) + " zł dnia: " + dates[rates.index(min(rates))])
-        min_label.grid(row=10, column=0, columnspan=3,padx=20)
-
-        average_label = tk.CTkLabel(master=self,
-                                 text="   Średnia wartość " + self.selected_currency.get() + " : "+  '%.2f' % np.mean(rates)+" zł" )
-        average_label.grid(row=11, column=0,columnspan=3,padx=20)
+        currency = self.selected_currency.get()
 
 
+        idx_max = np.argmax(rates)
+        idx_min = np.argmin(rates)
+        avg_val = np.mean(rates)
 
-    def createInformationForPrediction(self, rates,dates):
-        date_label = tk.CTkLabel(master=self, text="Przewidywany kurs "+self.selected_currency.get()+" od "+dates[0]+" do "+ dates[len(dates)-1])
-        date_label.grid(row=8,column=6,columnspan=3)
+        # Nagłówek i zakres dat
+        tk.CTkLabel(master=self, text=f"Liczba dni: {len(dates)}").grid(row=7, column=start_col, columnspan=3)
 
-        number_of_days_label = tk.CTkLabel(master=self,
-                                 text="Liczba dni: "+ str(len(dates)))
-        number_of_days_label.grid(row=7, column=6, columnspan=3)
+        tk.CTkLabel(master=self,
+                    text=f"{title_prefix} {currency} od {dates[0]} do {dates[-1]}").grid(row=8, column=start_col, columnspan=3)
 
-        max_label = tk.CTkLabel(master=self,
-                                 text="      Wartość maksymalna  " + self.selected_currency.get() + ": "+ '%.2f' % rates[np.argmax(rates)]+ " zł dnia: " + dates[np.argmax(rates)])
-        max_label.grid(row=9, column=6,columnspan=3,padx=20)
-        min_label = tk.CTkLabel(master=self,
-                                text="  Wartość minimalna  " + self.selected_currency.get() + ": " + '%.2f' % rates[ np.argmin(rates)] + " zł dnia: " + dates[np.argmin(rates)])
-        min_label.grid(row=10, column=6, columnspan=3,padx=20)
 
-        average_label = tk.CTkLabel(master=self,
-                                 text="   Średnia wartość " + self.selected_currency.get() + " : "+  '%.2f' % np.mean(rates)+" zł" )
-        average_label.grid(row=11, column=6,columnspan=3,padx=20)
+        tk.CTkLabel(master=self,
+                    text=f"Wartość maksymalna {currency}: {rates[idx_max]:.2f} zł dnia: {dates[idx_max]}").grid(row=9, column=start_col, columnspan=3, padx=20)
+
+        tk.CTkLabel(master=self,
+                    text=f"Wartość minimalna {currency}: {rates[idx_min]:.2f} zł dnia: {dates[idx_min]}").grid(row=10, column=start_col, columnspan=3, padx=20)
+
+        tk.CTkLabel(master=self,
+                    text=f"Średnia wartość {currency}: {avg_val:.2f} zł").grid(row=11, column=start_col, columnspan=3, padx=20)
 
 
 
@@ -140,6 +125,7 @@ class App(tk.CTk):
             rates = [item['mid'] for item in data]
 
             self.plotGraph(rates, dates, 6, 0, 'Kurs historyczny: ')
+            self.display_info(rates, dates, 0, "Kurs")
             self.prediction(rates, dates)
         except Exception as e:
             print(f"Błąd pobierania danych: {e}")
@@ -170,7 +156,7 @@ class App(tk.CTk):
 
         # 4. WYŚWIETLENIE WYNIKÓW
         self.plotGraph(y_pred, string_dates, 6, 6, 'Przewidywany kurs ')
-        self.createInformationForPrediction(y_pred, string_dates)
+        self.display_info(y_pred, string_dates, 6, "Przewidywany kurs")
 
 if __name__ == "__main__":
     app = App()

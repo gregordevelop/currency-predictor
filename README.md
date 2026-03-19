@@ -10,7 +10,7 @@ Aplikacja desktopowa do analizy historycznych kursów walut oraz przewidywania t
 - Nowoczesny interfejs graficzny zbudowany w `CustomTkinter`.
 
 ## 🛠️ Technologia
-- **Język:** Python 3.x
+- **Język:** Python 3.13
 - **Biblioteki GUI:** `CustomTkinter`, `TkCalendar`
 - **Analiza danych:** `NumPy`, `Requests` (API NBP)
 - **Machine Learning:** `Scikit-learn` (LinearRegression)
